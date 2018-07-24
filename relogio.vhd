@@ -36,7 +36,11 @@ SIGNAL seconds_buffer,
 			 minutes_buffer,
 			 hours_buffer: STD_LOGIC_VECTOR(5 DOWNTO 0);
 
-SIGNAL seconds, minutes, hours: INTEGER;
+SIGNAL seconds,
+			 minutes,
+			 hours,
+			 tz_value,
+			 tz_hour: INTEGER;
 
 COMPONENT one_second_tick
 	PORT (
@@ -77,6 +81,13 @@ COMPONENT display
 		display_3,
 		display_4,
 		display_5: OUT STD_LOGIC_VECTOR(6 downto 0)
+	);
+END COMPONENT;
+
+COMPONENT time_zone_select
+	PORT (
+		zone_select: IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+		zone_value: OUT INTEGER
 	);
 END COMPONENT;
 
@@ -145,10 +156,19 @@ BEGIN
 	minutes <= to_integer(unsigned(minutes_buffer));
 	hours <= to_integer(unsigned(hours_buffer));
 
+	-- Nao isqueci di faz3 o mohdi vintiqatru dahs oras
+
+	tz_select: time_zone_select
+		PORT MAP (
+			zone_select => SW(9 DOWNTO 0),
+			zone_value => tz_value
+		);
+
+	tz_hour <= (hours + tz_value) MOD 24;
 
 	displays: display
 		PORT MAP (
-			value => (hours * 10000 + minutes * 100 + seconds),
+			value => (tz_hour * 10000 + minutes * 100 + seconds),
 
 			display_0 => HEX0,
 			display_1 => HEX1,
