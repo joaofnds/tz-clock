@@ -25,7 +25,7 @@ BEGIN
 		ELSIF load='1' THEN
 			count <= preset;
 		ELSIF rising_edge(clock) THEN
-			IF count=(COUNT_TO+1) THEN
+			IF count=COUNT_TO THEN
 				count <= 0;
 			ELSE
 				count <= count + 1;
