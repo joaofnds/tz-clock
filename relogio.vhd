@@ -120,12 +120,12 @@ BEGIN
 		);
 
 
-	one_minute_clock <= seconds_buffer(5) AND
-											seconds_buffer(4) AND
-											seconds_buffer(3) AND
-											NOT seconds_buffer(2) AND
-											seconds_buffer(1) AND
-											seconds_buffer(0);
+	one_minute_clock <= NOT (seconds_buffer(5) OR
+													 seconds_buffer(4) OR
+													 seconds_buffer(3) OR
+													 seconds_buffer(2) OR
+													 seconds_buffer(1) OR
+													 seconds_buffer(0));
 
 	minutes_counter: counter_60
 		PORT MAP (
@@ -137,12 +137,12 @@ BEGIN
 			q => minutes_buffer
 		);
 
-	one_hour_clock <= minutes_buffer(5) AND
-										minutes_buffer(4) AND
-										minutes_buffer(3) AND
-										NOT minutes_buffer(2) AND
-										minutes_buffer(1) AND
-										minutes_buffer(0);
+	one_hour_clock <= NOT (minutes_buffer(5) OR
+												 minutes_buffer(4) OR
+												 minutes_buffer(3) OR
+												 minutes_buffer(2) OR
+												 minutes_buffer(1) OR
+												 minutes_buffer(0));
 
 	hours_counter: counter_24
 		PORT MAP (
