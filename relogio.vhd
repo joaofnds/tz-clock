@@ -21,16 +21,12 @@ ENTITY relogio IS
 END relogio;
 
 ARCHITECTURE behavior OF relogio IS
-SIGNAL is_counting,
-			 seconds_load,
-			 seconds_reset,
-			 minutes_load,
-			 minutes_reset,
+SIGNAL minutes_load,
 			 hours_load,
-			 hours_reset,
 		   one_second_clock,
 			 one_minute_clock,
-			 one_hour_clock: STD_LOGIC;
+			 one_hour_clock,
+			 load_time: STD_LOGIC;
 
 SIGNAL seconds_buffer,
 			 minutes_buffer,
@@ -104,26 +100,20 @@ END COMPONENT;
 BEGIN
 	HEX6 <= "1111111";
 	HEX7 <= "1111111";
-	is_counting <= SW(17);
 
-	seconds_reset <= SW(16);
-	minutes_reset <= SW(16);
-	hours_reset <= SW(16);
-
-	seconds_load <= SW(15);
-	minutes_load <= SW(15);
+	load_time <= SW(17);
 
 	seconds_clock: one_second_tick
 		PORT MAP (
-			clock => CLOCK_50 AND is_counting,
+			clock => CLOCK_50,
 			q => one_second_clock
 		);
 
 	seconds_counter: counter_60
 		PORT MAP (
 			clock => one_second_clock,
-			load => seconds_load,
-			reset => seconds_reset,
+			load => '0',
+			reset => '0',
 			preset => 0,
 
 			q => seconds_buffer
@@ -140,8 +130,8 @@ BEGIN
 	minutes_counter: counter_60
 		PORT MAP (
 			clock => one_minute_clock,
-			load => minutes_load,
-			reset => minutes_reset,
+			load => load_time,
+			reset => '0',
 			preset => minutes_preset,
 
 			q => minutes_buffer
@@ -157,8 +147,8 @@ BEGIN
 	hours_counter: counter_24
 		PORT MAP (
 			clock => one_hour_clock,
-			load => minutes_load,
-			reset => minutes_reset,
+			load => load_time,
+			reset => '0',
 			preset => hours_preset,
 
 			q => hours_buffer
