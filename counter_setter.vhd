@@ -5,7 +5,7 @@ USE IEEE.STD_LOGIC_1164.ALL;
 ENTITY counter_setter IS
 	PORT (
 		keys: IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-		
+
 		q_hours, q_min: OUT INTEGER
 	);
 END counter_setter;
@@ -13,7 +13,7 @@ END counter_setter;
 ARCHITECTURE behavior OF counter_setter IS
 constant KEY_0_UPPER_BOUND: INTEGER := 9;
 constant KEY_1_UPPER_BOUND: INTEGER := 5;
-constant KEY_2_UPPER_BOUND: INTEGER := 4;
+constant KEY_2_UPPER_BOUND: INTEGER := 3;
 constant KEY_3_UPPER_BOUND: INTEGER := 2;
 
 BEGIN
@@ -59,7 +59,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		q_hours <= q_0 + (q_1 * 10);
-		q_min <= q_2 + (q_3 * 10);
+		q_hours <=(q_3 * 10) + q_2;
+		q_min <= (q_1 * 10) + q_0;
 	END PROCESS;
 END behavior;
