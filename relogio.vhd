@@ -13,7 +13,9 @@ ENTITY relogio IS
 		HEX2,
 		HEX3,
 		HEX4,
-		HEX5: OUT STD_LOGIC_VECTOR(6 downto 0)
+		HEX5,
+		HEX6,
+		HEX7: OUT STD_LOGIC_VECTOR(6 downto 0)
 	);
 
 END relogio;
@@ -65,11 +67,33 @@ COMPONENT counter_24
 	);
 END COMPONENT;
 
+COMPONENT display
+	PORT (
+		value: IN INTEGER RANGE 0 TO 999999;
+
+		display_0,
+		display_1,
+		display_2,
+		display_3,
+		display_4,
+		display_5: OUT STD_LOGIC_VECTOR(6 downto 0)
+	);
+END COMPONENT;
+
 BEGIN
+	HEX6 <= "1111111";
+	HEX7 <= "1111111";
 	is_counting <= SW(17);
 
+	seconds_reset <= SW(16);
+	minutes_reset <= SW(16);
+	hours_reset <= SW(16);
+
 	seconds_clock: one_second_tick
-		PORT MAP (clock => CLOCK_50, q => one_second_clock);
+		PORT MAP (
+			clock => CLOCK_50 AND is_counting,
+			q => one_second_clock
+		);
 
 	seconds_counter: counter_60
 		PORT MAP (
@@ -85,9 +109,9 @@ BEGIN
 	one_minute_clock <= seconds_buffer(5) AND
 											seconds_buffer(4) AND
 											seconds_buffer(3) AND
-											seconds_buffer(2) AND
-											NOT seconds_buffer(1) AND
-											NOT seconds_buffer(0);
+											NOT seconds_buffer(2) AND
+											seconds_buffer(1) AND
+											seconds_buffer(0);
 
 	minutes_counter: counter_60
 		PORT MAP (
@@ -102,9 +126,9 @@ BEGIN
 	one_hour_clock <= minutes_buffer(5) AND
 										minutes_buffer(4) AND
 										minutes_buffer(3) AND
-										minutes_buffer(2) AND
-										NOT minutes_buffer(1) AND
-										NOT minutes_buffer(0);
+										NOT minutes_buffer(2) AND
+										minutes_buffer(1) AND
+										minutes_buffer(0);
 
 	hours_counter: counter_24
 		PORT MAP (
@@ -120,4 +144,17 @@ BEGIN
 	seconds <= to_integer(unsigned(seconds_buffer));
 	minutes <= to_integer(unsigned(minutes_buffer));
 	hours <= to_integer(unsigned(hours_buffer));
+
+
+	displays: display
+		PORT MAP (
+			value => (hours * 10000 + minutes * 100 + seconds),
+
+			display_0 => HEX0,
+			display_1 => HEX1,
+			display_2 => HEX2,
+			display_3 => HEX3,
+			display_4 => HEX4,
+			display_5 => HEX5
+		);
 END behavior;
