@@ -40,7 +40,9 @@ SIGNAL seconds,
 			 minutes,
 			 hours,
 			 tz_value,
-			 tz_hour: INTEGER;
+			 tz_hour,
+			 minutes_preset,
+			 hours_preset: INTEGER := 0;
 
 COMPONENT one_second_tick
 	PORT (
@@ -91,6 +93,14 @@ COMPONENT time_zone_select
 	);
 END COMPONENT;
 
+COMPONENT counter_setter
+	PORT (
+		keys: IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+
+		q_hours, q_min: OUT INTEGER
+	);
+END COMPONENT;
+
 BEGIN
 	HEX6 <= "1111111";
 	HEX7 <= "1111111";
@@ -99,6 +109,9 @@ BEGIN
 	seconds_reset <= SW(16);
 	minutes_reset <= SW(16);
 	hours_reset <= SW(16);
+
+	seconds_load <= SW(15);
+	minutes_load <= SW(15);
 
 	seconds_clock: one_second_tick
 		PORT MAP (
@@ -129,7 +142,7 @@ BEGIN
 			clock => one_minute_clock,
 			load => minutes_load,
 			reset => minutes_reset,
-			preset => 0,
+			preset => minutes_preset,
 
 			q => minutes_buffer
 		);
@@ -146,7 +159,7 @@ BEGIN
 			clock => one_hour_clock,
 			load => minutes_load,
 			reset => minutes_reset,
-			preset => 0,
+			preset => hours_preset,
 
 			q => hours_buffer
 		);
@@ -156,7 +169,13 @@ BEGIN
 	minutes <= to_integer(unsigned(minutes_buffer));
 	hours <= to_integer(unsigned(hours_buffer));
 
-	-- Nao isqueci di faz3 o mohdi vintiqatru dahs oras
+	ct_stter: counter_setter
+		PORT MAP (
+			keys => KEY(3 DOWNTO 0),
+
+			q_min => minutes_preset,
+			q_hours => hours_preset
+		);
 
 	tz_select: time_zone_select
 		PORT MAP (
