@@ -85,6 +85,7 @@ END COMPONENT;
 COMPONENT time_zone_select
 	PORT (
 		zone_select: IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+		daylight_saving_time: IN STD_LOGIC;
 		zone_value: OUT INTEGER
 	);
 END COMPONENT;
@@ -170,6 +171,7 @@ BEGIN
 	tz_select: time_zone_select
 		PORT MAP (
 			zone_select => SW(9 DOWNTO 0),
+			daylight_saving_time => SW(10),
 			zone_value => tz_value
 		);
 
